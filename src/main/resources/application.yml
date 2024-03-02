@@ -1,0 +1,49 @@
+spring:
+  redis:
+    host: 47.109.132.129
+    port: 6379
+    password: wlmxhyqrfd1.
+  resources:
+
+  driverClassName: com.mysql.cj.jdbc.Driver
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://47.109.132.129:3307/mydb?characterEncoding=utf-8&serverTimezone=UTC
+    username: root
+    password: wlmxhyqrfd1.
+
+server:
+  port: 8090
+
+  # 服务模块
+  devtools:
+    restart:
+      # 热部署开关
+      enabled: true
+      additional-paths: src/main/java
+  server:
+    tomcat:
+      max-http-post-size: 100MB  #请求参数长度
+      max-http-form-post-size: 100MB #form表单长度
+      max-swallow-size: -1
+  servlet:
+    multipart:
+      enabled: true
+      #默认1MB，此处修改为10MB
+      max-file-size: 10MB
+      #默认10MB
+      max-request-size: 100MB
+  web:
+    resources:
+      static-locations: classpath:static/
+      cache:
+        period: 0
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    ap-underscore-to-camel-case: true
+jackson:
+  date-format: yyyy-MM-dd HH:mm:ss
+  time-zone: GMT+8
+
