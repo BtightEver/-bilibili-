@@ -1,5 +1,6 @@
 package com.example.springbootstudy.pojo;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.util.Date;
 
@@ -93,6 +94,7 @@ public class Video {
     }
 
     //视频上传时间
+    
     Date uploadTime;
     //点赞数
     int likes;
