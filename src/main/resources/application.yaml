@@ -1,0 +1,26 @@
+#端口号8088,可根据需求自定义端口号
+server:
+  port: 8088
+
+#数据库名：mysql，用户名root，密码123456
+spring:
+  datasource:
+    username: root
+    password: wlmxhyqrfd1.
+    url: jdbc:mysql://47.109.132.129:3307/mydb?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # Redis配置文件
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 3000
+    database: 0
+
+# mybatis-plus配置
+mybatis-plus:
+  # xml文件位置
+  mapper-locations: classpath:mapper/*.xml
+
+
+
