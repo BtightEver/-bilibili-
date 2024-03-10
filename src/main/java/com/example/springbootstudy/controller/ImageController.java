@@ -1,5 +1,6 @@
 package com.example.springbootstudy.controller;
 
+import com.example.springbootstudy.config.AuthAccess;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin
 @RequestMapping("/images")
 public class ImageController {
+    @AuthAccess
     @GetMapping("")
     public ResponseEntity<Resource> getImage(@RequestParam String uid,@RequestParam String videoId) {
         String imageName=videoId+".jpg";
