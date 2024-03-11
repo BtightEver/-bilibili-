@@ -48,8 +48,8 @@ public class UserController {
     }
 
     @AuthAccess
-    @RequestMapping("/login")
-    public Result login(@RequestBody User user){
+    @PostMapping("/login")
+    public Result login(@RequestBody User user)throws Exception{
 
         System.out.println(user.toString());
         if(user.getUid() == null || user.getPassword() == null){
@@ -61,23 +61,22 @@ public class UserController {
     }
 
     @AuthAccess
-    @RequestMapping("/registery")
+    @PostMapping("/registery")
     public Result registery(@RequestBody User user) throws Exception {
-
+        System.out.println("收到了注册请求");
        return userService.Registery(user);
     }
 
     @AuthAccess
     @RequestMapping("/update")
     public Result update(@RequestBody User user){
-
         return userService.Update(user);
     }
 
     @AuthAccess
-    @RequestMapping("/updatePassword")
-    public Result updatePassword(@RequestBody User user) throws IOException {
-
+    @PostMapping("/updatePassword")
+    public Result updatePassword(@RequestBody User user) throws Exception {
+        System.out.println("新的密码是"+user.getNewPassword());
         return userService.UpdatePassword(user);
     }
 
@@ -94,22 +93,6 @@ public class UserController {
 
         userService.avatarDownload(fileName, response);
     }
-//====================================================================================================================//
-
-    @PostMapping("/addUser")
-    public String addUser(User user){
-        int res = 0;
-        if(user.getUid() != null){
-            res = UserMapper.addUser(user);
-        }
-        if(res > 0){
-            return "插入成功！";
-        }
-        else{
-            return "插入失败！";
-        }
-    }
-
     @AuthAccess
     @RequestMapping("/getUserByPage")   //分页查询
     public IPage getUserByPage(){

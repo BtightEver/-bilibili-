@@ -9,6 +9,7 @@ import com.example.springbootstudy.mapper.VideoMapperPlus;
 import com.example.springbootstudy.service.VideoService;
 import com.example.springbootstudy.pojo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -114,6 +115,7 @@ public class VideoController {
 
     @GetMapping("/list")
     @AuthAccess
+    @Cacheable("result")
     public Result query(@RequestParam("pageIndex") int pageIndex, @RequestParam("size") int size){
         try{
             Page<Video> page = new Page<>(pageIndex, size);  // 0表示页数，2表示每页多少个

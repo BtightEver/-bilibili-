@@ -1,18 +1,19 @@
 package com.example.springbootstudy.service;
 
 import com.auth0.jwt.JWT;
-import com.example.springbootstudy.Utils.FileUtil;
-import com.example.springbootstudy.Utils.JwtUtil;
-import com.example.springbootstudy.Utils.MyRedisUtil;
+import com.example.springbootstudy.Utils.*;
 import com.example.springbootstudy.exception.ServiceException;
 import com.example.springbootstudy.mapper.UserMapper;
 import com.example.springbootstudy.pojo.Result;
 import com.example.springbootstudy.pojo.User;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
@@ -21,8 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 
@@ -42,7 +45,7 @@ public class UserService {
         if(dbuser == null){
             throw new ServiceException("用户不存在!");
         }
-
+        user.setPassword(EncoderUtil.encode(user.getPassword()));
         if(!user.getPassword().equals(dbuser.getPassword())){
             throw new ServiceException("密码错误！");
         }
@@ -53,32 +56,15 @@ public class UserService {
     }
 
     public Result Registery(@RequestBody User user) throws Exception {
-
+        user.setCreateTime(new Date());
+        user.setPassword(EncoderUtil.encode(user.getPassword()));
         System.out.println("用户信息："+user.toString());
-        String registeryUid = user.getUid();
+        JedisConnectionPool jedisPool = JedisConnectionPool.getInstance("47.109.132.129", 6379, "wlmxhyqrfd1.");
+        Jedis jedis = jedisPool.getConnection();
+        user.setUid(LuaUtil.getNextUid(jedis));
         String originalAvatar = "http://localhost:8088/User/avatarDownload/originalAvatar.jpg";
-
-        //首先判断注册的id是否重复，首先对缓存进行判断，如果缓存中有重复，则不需要访问数据库，减轻负担
-        if(myRedisUtil.containsKey(registeryUid)){
-            return Result.error();
-        }
-        else {      //如果缓存中不存在相同的ID，就去数据库中判断
-            User userByUid = userMapper.getUserByUid(registeryUid);
-            if(userByUid != null) {        //如果通过ID可以从数据库中查找到相应的用户，则说明该ID存在
-                return Result.error();
-            }
-            else {      //如果该ID在缓存和数据库中都不存在，则可以注册
-                //需要添加用户创建日期，日期需要转换......
-                user.setAvatar(originalAvatar);
-                int stateCode = userMapper.addUser(user);       //向数据库中添加用户
-                if(stateCode > 0){
-                    myRedisUtil.cacheValue(registeryUid, user, 3600 * 48);         //向缓存中添加用户，设置用户最多在缓存中存在两天
-                    return Result.ok().data("user", user);
-                }
-            }
-        }
-
-        return Result.error();
+        userMapper.addUser(user);
+        return Result.ok();
     }
 
     public Result Update(@RequestBody User user){
@@ -96,30 +82,19 @@ public class UserService {
     }
 
     public Result UpdatePassword(@RequestBody User user){
-
-        System.out.println("user==="+user);
-        String Uid = user.getUid();
-        String passWord = user.getPassword();
-
-        System.out.println("password==="+passWord);
-        User dbuser = userMapper.getUserByUid(Uid);
-        dbuser.setPassword(passWord);
-
-        int stateCode = userMapper.updatePassword(dbuser);
-        if(stateCode > 0){
-            if(myRedisUtil.containsKey(Uid)){
-                myRedisUtil.removeValue(Uid);
-                myRedisUtil.cacheValue(Uid, dbuser, 3600 * 48);
-            }
-            else {
-                myRedisUtil.cacheValue(Uid, dbuser, 3600 * 48);
-            }
-            return Result.ok().data("user", dbuser);
+        User dbuser = userMapper.getUserByUid(user.getUid());
+        if(dbuser == null){
+            return Result.error().data("message","用户不存在");
         }
-
-        return Result.error();
+        user.setPassword(EncoderUtil.encode(user.getPassword()));
+        if(!user.getPassword().equals(dbuser.getPassword())){
+            return Result.error().data("message","密码错误");
+        }
+        user.setPassword(EncoderUtil.encode(user.getNewPassword()));
+        userMapper.updatePassword(user);
+        return Result.ok().data("message","更新密码成功");
     }
-
+    @Cacheable("result")
     public Result getUserByUid(String uid){
         
         User dbuser = userMapper.getUserByUid(uid);     //先从 Redis 缓存中取

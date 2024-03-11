@@ -4,11 +4,12 @@ import com.example.springbootstudy.Utils.ResultCode;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @AllArgsConstructor
-public class Result {
+public class Result implements Serializable {
     private boolean success;
     private Integer code;
     private String message;

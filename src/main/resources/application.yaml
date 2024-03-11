@@ -4,6 +4,10 @@ server:
 
 #数据库名：mysql，用户名root，密码123456
 spring:
+  security:
+    user:
+      passwordEncoder: bcrypt
+      passwordStrength: 10
   datasource:
     username: root
     password: wlmxhyqrfd1.
@@ -12,10 +16,9 @@ spring:
 
   # Redis配置文件
   redis:
-    host: localhost
+    host: 47.109.132.129
     port: 6379
-    timeout: 3000
-    database: 0
+    password: wlmxhyqrfd1.
 
 # mybatis-plus配置
 mybatis-plus:
