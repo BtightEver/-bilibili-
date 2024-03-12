@@ -9,6 +9,7 @@ import com.example.springbootstudy.pojo.Result;
 import com.example.springbootstudy.pojo.User;
 import com.example.springbootstudy.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/User")
 @ResponseBody
+
 public class UserController {
 
     @Autowired  // 注入bean
